@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Code By @dark_enza</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background: #333; /* Koyu gri arka plan rengi */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            color: #fff; /* Beyaz metin rengi */
+        }
+        .qr-code {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+        }
+        .value-box {
+            background: #444; /* Koyu gri kutucuk arka plan rengi */
+            padding: 10px;
+            margin: 10px;
+            border: 2px solid #8B008B; /* Mor neon renkli kenarlık */
+            border-radius: 10px;
+        }
+        .copy-button {
+            background-color: #000; /* Siyah arka plan rengi */
+            color: #8B008B; /* Mor neon rengi yazı rengi */
+            border: 2px solid #8B008B; /* Mor neon renkli kenarlık */
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .title {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">Ubigi eSIM By @dwstoree</div>
+        <div class="qr-code" id="qrcode"></div>
+        <div class="value-box" id="values">
+            <div id="smdp">SMDP: </div>
+            <div id="matching">Matching ID: </div>
+        </div>
+        <button class="copy-button" id="copy-smdp" onclick="copyToClipboard('smdp')">Copy SMDP</button>
+        <button class="copy-button" id="copy-matching" onclick="copyToClipboard('matching')">Copy Matching ID</button>
+    </div>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script>
+        // JavaScript ile SMDP ve Matching ID değerlerini güncelleyin ve QR kodu oluşturun
+        fetch('/values')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('smdp').textContent += data.smdp;
+                document.getElementById('matching').textContent += data.matching;
+
+                const qr = new QRCode(document.getElementById("qrcode"), {
+                    text: `LPA:1$${data.smdp}$${data.matching}`,
+                    width: 200,
+                    height: 200
+                });
+            })
+            .catch(error => {
+                console.error('Veriler alınamadı:', error);
+            });
+
+        // Kopyala butonu için işlev
+        function copyToClipboard(id) {
+            const valueToCopy = document.getElementById(id).textContent;
+            const el = document.createElement('textarea');
+            el.value = valueToCopy;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            alert(`${id} başarıyla kopyalandı.`);
+        }
+    </script>
+</body>
+</html>
