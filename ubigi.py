@@ -1,12 +1,16 @@
 import http.server
 import socketserver
+import threading
+import requests
+
+class ThreadedHTTPServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
+    pass
 
 class MyHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         if self.path == '/':
             self.path = '/index.html'  # Kök URL'yi index.html dosyasına yönlendir
         elif self.path == '/values':
-            import requests
             head = {
                 "Pragma": "no-cache",
                 "Origin": "ionic://ubigi.me",
@@ -36,7 +40,11 @@ class MyHandler(http.server.SimpleHTTPRequestHandler):
 
         super().do_GET()
 
-port = 1055
-with socketserver.TCPServer(("", port), MyHandler) as httpd:
-    print(f"Serving at port {port}")
-    httpd.serve_forever()
+if __name__ == '__main__':
+    port = 1055
+    with ThreadedHTTPServer(("", port), MyHandler) as httpd:
+        print(f"Serving at port {port}")
+        server_thread = threading.Thread(target=httpd.serve_forever)
+        server_thread.daemon = True
+        server_thread.start()
+        server_thread.join()
